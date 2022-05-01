@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -13,14 +14,27 @@ namespace JwtWebApiTutorial.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
         public static User user = new User();
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration,IUserService userService)
         {
             _configuration = configuration;
+            _userService = userService;
         }
 
+        [HttpGet, Authorize]
+        public ActionResult<object> GetUserIdentity()
+        {
+            //var userName = User?.Identity?.Name;
+            //var userName2 = User.FindFirstValue(ClaimTypes.Name);
+            //var role = User.FindFirstValue(ClaimTypes.Role);
 
+            //return Ok(new { userName,userName2,role});
+             var userInfo = _userService.GetInfo();
+            return Ok(userInfo);
+
+        }
 
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDto request)
